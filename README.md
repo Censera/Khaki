@@ -1,6 +1,6 @@
-<div style="display: flex; flex-direction: column;">
+<div style="display: flex; flex-direction: row;">
 <img src="https://github.com/Censera/Khaki/blob/main/assets/Khaki%20logo.png" style="width:48px; height:48px; margin-right:16px">
-<p><strong">Khaki</strong><sub> By Censera</sub></p>
+<p style="font-size: 26px"><strong">Khaki</strong><sub> By Censera</sub></p>
 </div>
 
 Small program for creating folder project for C programming language.
