@@ -1,9 +1,7 @@
 <div style="display: flex">
 <img src="https://github.com/Censera/Khaki/blob/main/assets/Khaki%20logo.png" style="width:48px; height:48px; margin-right:16px">
-<h1><strong style="font-size: 26px; ">Khaki</strong><sub> By Censera</sub></h1>
+<h1 style="border: none"><strong">Khaki</strong><sub> By Censera</sub></h1>
 </div>
-
-___
 
 Small program for creating folder project for C programming language.
 
