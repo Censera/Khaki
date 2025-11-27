@@ -6,63 +6,102 @@ ACTION=$1
 TARGET=$2
 OPTION=$3
 
+
+## Colors
+
+WHITE="\e[0;37m"
+RED="\e[0;31m"
+GREEN="\e[0;32m"
+YELLOW="\e[0;33m"
+BLUE="\e[0;34m"
+PURPLE="\e[0;35m"
+CYAN="\e[0;36m"
+RESET="\e[0m"
+
 ## Functions
 
+if [ -z $ACTION ]; then
+  echo "
+  Usage: khaki <command> [options]
+
+  Commands:
+    new <name>          Create a new C project with src/, include/, 
+                        README.md, and main.c
+    run <output> [...]  Compile all .c files in the current directory into <output>
+                        Additional arguments are passed to the compiler
+    show -L <depth>     Display project tree using 'tree' if available
+    config              Placeholder (no functionality yet)
+
+  Examples:
+    khaki new myproj
+    khaki run app -O2 -Wall
+    khaki show -L 2
+"
+  if ! command -v norminette >/dev/null 2>&1; then
+    echo -e "${YELLOW}WARNING:${RESET} norminette is not in your path"
+  fi
+
+  if ! command -v trees >/dev/null 2>&1; then 
+    echo -e "${YELLOW}WARNING:${RESET} tree is not in your path"
+  fi
+fi
+
+
 new_fn() {
-  local DIR="New Project"
+  local NAME="New Project"
 
   if [ -n "$TARGET" ]; then
-    DIR="$TARGET"
+    NAME="$TARGET"
   fi
   
-  mkdir -p "$DIR"
+  mkdir -p "$NAME"
   
-  touch "${DIR}/main.c"
-  touch "${DIR}/README.md"
+  touch "${NAME}/main.c"
+  touch "${NAME}/README.md"
+  mkdir "${NAME}/src"
+  mkdir "${NAME}/include"
   
-  echo "Created the directory ${DIR}"
+  echo -e "${CYAN}Created the directory${RESET} ${DIR}"
 
   if [[ -z "$OPTION" || "$OPTION" != "--open-not" ]]; then
     cd "$DIR" || retrun 1
   fi
 
-  if command -v tree >/dev/null 2>&1; then
-    tree -C
-  else
-    echo "tree command not found"
-  fi
+  tree -C
 }
 
 create_fn() {
   if [ -n "$TARGET" ]; then
     touch $TARGET
   else
-    echo "You need to add the name of the file you want to create"
+    echo -e "${PURPLE}NOTE:${RESET} You need to add the name of the file you want to create"
   fi
 }
 
 run_fn() {
-  if [ -e "main.c" ]; then
-    echo "Running project in ${PWD}..."
+  cfiles=$(find . -maxdepth 1 -type f -name "*.c")  
+
+  if [ ${#cfiles[@]} -ne 0 ]; then
+    echo -e "${CYAN}Running project in${RESET} ${PWD}...\n"
    
-    if [ -n "$OPTION"]; then
-     gcc main.c $OPTION -o "$TARGET"
+    if [ -n "$OPTION" -a -n "$TARGET" ]; then
+     gcc ${cfiles[@]} $OPTION -o "$TARGET"
     else
-     gcc main.c -o "$TARGET"
+     gcc ${cfiles[@]} -o a.out
     fi
     
-    if [ $? -e 0 ]; then
+    if [ $? -eq 0 ]; then
       ./"$TARGET"
       if [ $? -eq 0 ]; then
-        echo "Project execution finished"
+        echo -e "\n${GREEN}Project execution finished${RESET}"
       else
-        echo "Project execution failed"
+        echo -e "\n${RED}ERROR:${RESET} Project execution failed"
       fi
     else
-      echo "Compilation failed"
+      echo -e "\n${RED}ERROR:${RESET} Compilation failed"
     fi
   else
-    echo "main.c not found"  
+    echo -e "\n${YELLOW}WARNING:${RESET} no .c were found"  
   fi      
 }
 
@@ -71,7 +110,6 @@ config_fn() {
 }
 
 ## Cases
-
 case "$ACTION" in
   new) new_fn;;
   create) create_fn;;
@@ -81,5 +119,4 @@ case "$ACTION" in
     tree $TARGET $OPTION
   ;;
   config) config_fn;;
-  *) echo "there is nothing to do"
 esac
