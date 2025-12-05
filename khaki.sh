@@ -1,4 +1,16 @@
+#!/bin/bash
+
 ## This is a script for C projects
+
+
+
+
+## Config
+
+typeset -A config
+config=(
+  [USER]="ME!"
+)
 
 ## Args
 
@@ -57,35 +69,88 @@ new_fn() {
   mkdir -p "$NAME"
   
   touch "${NAME}/main.c"
+  echo "#include <stdio.h>
+int main(int argc, char **argv)
+{
+  printf(\"Hello, ${config[USER]}!\n\");
+  return 0;
+}" > "${NAME}/main.c"
   touch "${NAME}/README.md"
+  echo "# ${NAME}
+
+
+
+## Highlights
+
+
+
+## Overview
+
+
+
+### Authors
+
+List contributors or the maintaining group.
+
+
+
+## Usage
+
+
+
+## Installation
+
+" > "${NAME}/README.md"
+  
   mkdir "${NAME}/src"
   mkdir "${NAME}/include"
   
-  echo -e "${CYAN}Created the directory${RESET} ${DIR}"
+  echo -e "${CYAN}Created the directory${RESET} ${NAME}\n"
+
+  tree -C $NAME
 
   if [[ -z "$OPTION" || "$OPTION" != "--open-not" ]]; then
-    cd "$DIR" || retrun 1
+    cd "$NAME" || retrun 1
   fi
 
-  tree -C
 }
 
-create_fn() {
-  if [ -n "$TARGET" ]; then
-    touch $TARGET
+create_fn() { 
+  if [ -n "$TARGET" ]; then 
+  case "$TARGET" in
+    main.c)
+      printf '#include <stdio.h>
+
+int main(int argc, char **argv)
+{
+  printf("Hello, %s!\\n");
+  return 0;
+}
+' "${config[USER]}" > "main.c"
+      ;;
+    *)
+      touch -- "$TARGET"
+      ;;
+   esac
   else
-    echo -e "${PURPLE}NOTE:${RESET} You need to add the name of the file you want to create"
+    printf "${PURPLE}NOTE:${RESET} Need target!\n"
   fi
+
 }
 
 run_fn() {
+
+  # cfiles: list of .c in the project diractory
+  # OPTION: compiler flags
+  # TARGET: the name of the excutable
+
   cfiles=$(find . -maxdepth 1 -type f -name "*.c")  
 
   if [ ${#cfiles[@]} -ne 0 ]; then
     echo -e "${CYAN}Running project in${RESET} ${PWD}...\n"
    
     if [ -n "$OPTION" -a -n "$TARGET" ]; then
-     gcc ${cfiles[@]} $OPTION -o "$TARGET"
+     gcc ${cfiles[@]} "$OPTION" -o "$TARGET" "${$3..$10}"
     else
      gcc ${cfiles[@]} -o a.out
     fi
@@ -106,7 +171,7 @@ run_fn() {
 }
 
 config_fn() {
-  echo no config for now
+  echo Set a user name:
 }
 
 ## Cases
